@@ -1,0 +1,8 @@
+streamlit
+google-generativeai
+duckduckgo-search
+streamlit-option-menu
+requests
+Pillow
+PyPDF2
+python-docx
