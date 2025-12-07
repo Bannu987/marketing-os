@@ -151,7 +151,6 @@ class MADEngine:
         try:
             if not self.gemini_key: return "Error: Gemini API key not configured"
             
-            # Syntax Safe String Construction
             context_str = f"Additional Context from Files/URLs:\n{context}\n" if context else ""
             feedback_str = f"Previous Critic Feedback: {previous_feedback}" if previous_feedback else ""
             
