@@ -20,8 +20,22 @@ st.set_page_config(
 
 # --- SESSION STATE INITIALIZATION ---
 if 'history' not in st.session_state: st.session_state.history = []
-if 'gemini_key' not in st.session_state: st.session_state.gemini_key = ""
-if 'perplexity_key' not in st.session_state: st.session_state.perplexity_key = ""
+
+# --- API KEY SETUP (Auto-Load from Secrets) ---
+if 'gemini_key' not in st.session_state:
+    # Try to load from Streamlit Secrets (Cloud)
+    try:
+        st.session_state.gemini_key = st.secrets["GEMINI_API_KEY"]
+    except:
+        st.session_state.gemini_key = ""
+
+if 'perplexity_key' not in st.session_state:
+    try:
+        st.session_state.perplexity_key = st.secrets["PERPLEXITY_API_KEY"]
+    except:
+        st.session_state.perplexity_key = ""
+
+# --- REST OF STATE ---
 if 'current_analysis' not in st.session_state: st.session_state.current_analysis = None
 if 'uploaded_files' not in st.session_state: st.session_state.uploaded_files = []
 if 'uploaded_images' not in st.session_state: st.session_state.uploaded_images = []
@@ -77,7 +91,7 @@ def inject_custom_css():
         [data-baseweb="tag"] svg { fill: #0d9488 !important; }
         [data-baseweb="tag"]:hover { background-color: #99f6e4 !important; border-color: #0d9488 !important; }
         
-        /* CHAT & BADGES */
+        /* CHAT MESSAGES */
         .chat-message { padding: 12px 16px; border-radius: 12px; margin: 8px 0; font-size: 0.95rem; line-height: 1.5; }
         .user-message { background-color: #14b8a6; color: white; margin-left: 20%; border-bottom-right-radius: 4px; }
         .agent-message { background-color: #ffffff; border: 1px solid #e7e5e4; margin-right: 20%; border-bottom-left-radius: 4px; }
@@ -288,9 +302,13 @@ with st.sidebar:
 
     st.markdown('<div class="section-header">SYSTEM</div>', unsafe_allow_html=True)
     with st.expander("⚙️ Configuration", expanded=False):
-        k1 = st.text_input("Gemini API Key", type="password", value=st.session_state.gemini_key)
+        # Auto-fill keys if available in secrets, otherwise let user type
+        default_gemini = st.session_state.gemini_key if st.session_state.gemini_key else ""
+        k1 = st.text_input("Gemini API Key", type="password", value=default_gemini)
         if k1: st.session_state.gemini_key = k1
-        k2 = st.text_input("Perplexity API Key", type="password", value=st.session_state.perplexity_key)
+        
+        default_perp = st.session_state.perplexity_key if st.session_state.perplexity_key else ""
+        k2 = st.text_input("Perplexity API Key", type="password", value=default_perp)
         if k2: st.session_state.perplexity_key = k2
     
     st.markdown("<br>", unsafe_allow_html=True)
