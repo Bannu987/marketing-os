@@ -18,13 +18,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- SESSION STATE INITIALIZATION ---
+# --- SESSION STATE INITIALIZATION (Secure Load) ---
 if 'history' not in st.session_state: st.session_state.history = []
 
-# --- API KEY SETUP (Auto-Load from Secrets) ---
+# --- API KEY SETUP: LOADS SECRETS IMMEDIATELY ---
 if 'gemini_key' not in st.session_state:
-    # Try to load from Streamlit Secrets (Cloud)
     try:
+        # Tries to load from Streamlit Secrets or local secrets.toml
         st.session_state.gemini_key = st.secrets["GEMINI_API_KEY"]
     except:
         st.session_state.gemini_key = ""
@@ -302,14 +302,29 @@ with st.sidebar:
 
     st.markdown('<div class="section-header">SYSTEM</div>', unsafe_allow_html=True)
     with st.expander("⚙️ Configuration", expanded=False):
-        # Auto-fill keys if available in secrets, otherwise let user type
-        default_gemini = st.session_state.gemini_key if st.session_state.gemini_key else ""
-        k1 = st.text_input("Gemini API Key", type="password", value=default_gemini)
-        if k1: st.session_state.gemini_key = k1
-        
-        default_perp = st.session_state.perplexity_key if st.session_state.perplexity_key else ""
-        k2 = st.text_input("Perplexity API Key", type="password", value=default_perp)
-        if k2: st.session_state.perplexity_key = k2
+        # --- SECURE GEMINI HANDLING ---
+        has_env_gemini = False
+        try:
+            if "GEMINI_API_KEY" in st.secrets: has_env_gemini = True
+        except: pass
+
+        if has_env_gemini:
+            st.success("✅ Gemini Key Loaded (Secure)")
+        else:
+            k1 = st.text_input("Gemini API Key", type="password", value=st.session_state.gemini_key)
+            if k1: st.session_state.gemini_key = k1
+
+        # --- SECURE PERPLEXITY HANDLING ---
+        has_env_perp = False
+        try:
+            if "PERPLEXITY_API_KEY" in st.secrets: has_env_perp = True
+        except: pass
+
+        if has_env_perp:
+            st.success("✅ Perplexity Key Loaded (Secure)")
+        else:
+            k2 = st.text_input("Perplexity API Key", type="password", value=st.session_state.perplexity_key)
+            if k2: st.session_state.perplexity_key = k2
     
     st.markdown("<br>", unsafe_allow_html=True)
     status = check_systems()
@@ -342,9 +357,9 @@ else:
     file_context = st.session_state.url_context
     if st.session_state.uploaded_files:
         st.markdown("###### 📎 Attached Context:")
-        badges = ""
+        badges = "".join([f'<span class="file-badge">📄 {f.name}</span>' for f in st.session_state.uploaded_files])
+        st.markdown(badges, unsafe_allow_html=True)
         for f in st.session_state.uploaded_files:
-            badges += f'<span class="file-badge">📄 {f.name}</span>'
             if f.type == "application/pdf": file_context += f"\nFILE: {f.name}\n{extract_text_from_pdf(f)}"
             elif "text" in f.type: file_context += f"\nFILE: {f.name}\n{extract_text_from_txt(f)}"
             elif "document" in f.type: file_context += f"\nFILE: {f.name}\n{extract_text_from_docx(f)}"
