@@ -42,6 +42,25 @@ if 'uploaded_images' not in st.session_state: st.session_state.uploaded_images =
 if 'url_context' not in st.session_state: st.session_state.url_context = ""
 if 'chat_mode' not in st.session_state: st.session_state.chat_mode = False
 if 'chat_messages' not in st.session_state: st.session_state.chat_messages = []
+if 'theme' not in st.session_state: st.session_state.theme = "light"
+
+# --- BRAND & PROJECT STATE ---
+if 'brand_name' not in st.session_state: st.session_state.brand_name = ""
+if 'brand_voice' not in st.session_state: st.session_state.brand_voice = ""
+if 'brand_audience' not in st.session_state: st.session_state.brand_audience = ""
+if 'brand_offer' not in st.session_state: st.session_state.brand_offer = ""
+if 'project_name' not in st.session_state: st.session_state.project_name = ""
+if 'project_goal' not in st.session_state: st.session_state.project_goal = ""
+
+# --- STRATEGY PIPELINE STATE ---
+if 'seo_prefill' not in st.session_state: st.session_state.seo_prefill = ""
+if 'ppc_prefill' not in st.session_state: st.session_state.ppc_prefill = ""
+if 'social_prefill' not in st.session_state: st.session_state.social_prefill = ""
+if 'copy_prefill' not in st.session_state: st.session_state.copy_prefill = ""
+if 'target_agent' not in st.session_state: st.session_state.target_agent = None
+
+# --- PLAYBOOKS STATE ---
+if 'playbook' not in st.session_state: st.session_state.playbook = "None"
 
 # --- HYBRID AESTHETIC CSS ---
 def inject_custom_css():
@@ -49,57 +68,182 @@ def inject_custom_css():
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap');
         
+        /* CSS VARIABLES - Light Mode (Default) */
+        :root {
+            --color-bg: #fafaf9;
+            --color-bg-secondary: #ffffff;
+            --color-text: #1a1f2e;
+            --color-text-secondary: #57534e;
+            --color-text-muted: #a8a29e;
+            --color-primary: #14b8a6;
+            --color-primary-hover: #0d9488;
+            --color-primary-light: #f0fdfa;
+            --color-primary-dark: #0f766e;
+            --color-accent: #10b981;
+            --color-error: #ef4444;
+            --color-border: #e7e5e4;
+            --color-border-hover: #d6d3d1;
+            --color-card-bg: #ffffff;
+            --color-card-border: #e7e5e4;
+            --color-shadow: rgba(0, 0, 0, 0.05);
+            --color-shadow-hover: rgba(0, 0, 0, 0.08);
+            --color-primary-shadow: rgba(20, 184, 166, 0.2);
+            --color-primary-shadow-hover: rgba(20, 184, 166, 0.3);
+        }
+        
+        /* CSS VARIABLES - Dark Mode */
+        body[data-theme="dark"] {
+            --color-bg: #1a1f2e;
+            --color-bg-secondary: #2d3441;
+            --color-text: #fafaf9;
+            --color-text-secondary: #d6d3d1;
+            --color-text-muted: #a8a29e;
+            --color-primary: #14b8a6;
+            --color-primary-hover: #0d9488;
+            --color-primary-light: #1a3d37;
+            --color-primary-dark: #0f766e;
+            --color-accent: #10b981;
+            --color-error: #ef4444;
+            --color-border: #3d4754;
+            --color-border-hover: #4a5568;
+            --color-card-bg: #2d3441;
+            --color-card-border: #3d4754;
+            --color-shadow: rgba(0, 0, 0, 0.3);
+            --color-shadow-hover: rgba(0, 0, 0, 0.5);
+            --color-primary-shadow: rgba(20, 184, 166, 0.3);
+            --color-primary-shadow-hover: rgba(20, 184, 166, 0.4);
+        }
+        
         /* BASE */
-        .stApp { background-color: #fafaf9; color: #1a1f2e; font-family: 'Roboto', sans-serif; }
+        .stApp { background-color: var(--color-bg); color: var(--color-text); font-family: 'Roboto', sans-serif; }
         
         /* SIDEBAR */
-        [data-testid="stSidebar"] { background-color: #ffffff; border-right: 1px solid #e7e5e4; font-family: 'Roboto', sans-serif; }
+        [data-testid="stSidebar"] { background-color: var(--color-bg-secondary); border-right: 1px solid var(--color-border); font-family: 'Roboto', sans-serif; }
         
         /* HEADERS & TEXT */
-        .section-header { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #a8a29e; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Roboto', sans-serif; }
-        .gradient-text { background: transparent; -webkit-text-fill-color: #1a1f2e; color: #1a1f2e; font-weight: 700; font-size: 2rem; margin-bottom: 0.5rem; letter-spacing: -0.02em; font-family: 'Roboto', sans-serif; }
+        .section-header { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); font-weight: 600; margin: 20px 0 8px 0; font-family: 'Roboto', sans-serif; }
+        .gradient-text { background: transparent; -webkit-text-fill-color: var(--color-text); color: var(--color-text); font-weight: 700; font-size: 2rem; margin-bottom: 0.5rem; letter-spacing: -0.02em; font-family: 'Roboto', sans-serif; }
         
         /* BUTTONS */
-        .stButton button[kind="primary"] { background-color: #14b8a6; color: white !important; border: none; width: 100%; border-radius: 8px; padding: 10px 16px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(20, 184, 166, 0.2); transition: all 0.2s ease; }
-        .stButton button[kind="primary"]:hover { background-color: #0d9488; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3); transform: translateY(-1px); }
-        .stButton button:not([kind="primary"]) { background-color: #ffffff; color: #1a1f2e; border: 1px solid #e7e5e4; border-radius: 6px; font-weight: 500; padding: 10px 20px; transition: all 0.2s ease; }
-        .stButton button:not([kind="primary"]):hover { border-color: #14b8a6; color: #14b8a6; }
+        .stButton button[kind="primary"] { background-color: var(--color-primary); color: white !important; border: none; width: 100%; border-radius: 8px; padding: 10px 16px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 2px 4px var(--color-primary-shadow); transition: all 0.2s ease; }
+        .stButton button[kind="primary"]:hover { background-color: var(--color-primary-hover); box-shadow: 0 4px 12px var(--color-primary-shadow-hover); transform: translateY(-1px); }
+        .stButton button:not([kind="primary"]) { background-color: var(--color-bg-secondary); color: var(--color-text); border: 1px solid var(--color-border); border-radius: 6px; font-weight: 500; padding: 10px 20px; transition: all 0.2s ease; }
+        .stButton button:not([kind="primary"]):hover { border-color: var(--color-primary); color: var(--color-primary); }
         
         /* COMPONENTS */
         iframe[title="streamlit_option_menu.option_menu"] { margin-top: -10px; }
-        .streamlit-expanderHeader { font-size: 0.9rem; color: #57534e; background-color: transparent; border: none; }
-        [data-testid="stFileUploader"] { border: 1px dashed #e7e5e4; padding: 10px; border-radius: 8px; background-color: #ffffff; }
+        .streamlit-expanderHeader { font-size: 0.9rem; color: var(--color-text-secondary); background-color: transparent; border: none; }
+        [data-testid="stFileUploader"] { border: 1px dashed var(--color-border); padding: 10px; border-radius: 8px; background-color: var(--color-bg-secondary); }
         
         /* CARDS */
-        .ui-card { background-color: #ffffff; border: 1px solid #e7e5e4; border-radius: 8px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); transition: all 0.2s ease; }
-        .ui-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border-color: #d6d3d1; transform: translateY(-1px); }
+        .ui-card { background-color: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: 8px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 2px var(--color-shadow); transition: all 0.2s ease; }
+        .ui-card:hover { box-shadow: 0 4px 12px var(--color-shadow-hover); border-color: var(--color-border-hover); transform: translateY(-1px); }
         
         /* STATUS & DEBATE */
-        .status-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 500; background-color: #fafaf9; border: 1px solid #e7e5e4; color: #57534e; margin-right: 8px; font-family: 'Roboto', sans-serif; }
-        .dot-online { width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; margin-right: 6px; }
-        .dot-offline { width: 6px; height: 6px; background-color: #ef4444; border-radius: 50%; margin-right: 6px; }
-        .debate-creator { background-color: #f0fdfa; border-left: 3px solid #14b8a6; padding: 12px 16px; margin: 8px 0; border-radius: 4px; font-size: 0.9em; }
-        .debate-critic { background-color: #fef2f2; border-left: 3px solid #ef4444; padding: 12px 16px; margin: 8px 0; border-radius: 4px; font-size: 0.9em; }
+        .status-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 500; background-color: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text-secondary); margin-right: 8px; font-family: 'Roboto', sans-serif; }
+        .dot-online { width: 6px; height: 6px; background-color: var(--color-accent); border-radius: 50%; margin-right: 6px; }
+        .dot-offline { width: 6px; height: 6px; background-color: var(--color-error); border-radius: 50%; margin-right: 6px; }
+        .debate-creator { background-color: var(--color-primary-light); border-left: 3px solid var(--color-primary); padding: 12px 16px; margin: 8px 0; border-radius: 4px; font-size: 0.9em; }
+        .debate-critic { background-color: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--color-error); padding: 12px 16px; margin: 8px 0; border-radius: 4px; font-size: 0.9em; }
         
         /* INPUTS */
-        .stTextArea textarea, .stTextInput input { border-radius: 6px; border: 1px solid #e7e5e4; transition: border-color 0.2s ease; font-family: 'Roboto', sans-serif; }
-        .stTextArea textarea:focus, .stTextInput input:focus { border-color: #14b8a6; box-shadow: 0 0 0 1px #14b8a6; outline: none; }
+        .stTextArea textarea, .stTextInput input { border-radius: 6px; border: 1px solid var(--color-border); transition: border-color 0.2s ease; font-family: 'Roboto', sans-serif; background-color: var(--color-bg-secondary); color: var(--color-text); }
+        .stTextArea textarea:focus, .stTextInput input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 1px var(--color-primary); outline: none; }
         
         /* METRICS & TAGS */
-        [data-testid="stMetricValue"] { color: #1a1f2e; font-weight: 600; font-family: 'Roboto', sans-serif; }
-        [data-baseweb="tag"] { background-color: #ccfbf1 !important; border: 1px solid #14b8a6 !important; color: #115e59 !important; font-weight: 500; padding: 4px 12px; border-radius: 6px; font-family: 'Roboto', sans-serif; }
-        [data-baseweb="tag"] svg { fill: #0d9488 !important; }
-        [data-baseweb="tag"]:hover { background-color: #99f6e4 !important; border-color: #0d9488 !important; }
+        [data-testid="stMetricValue"] { color: var(--color-text); font-weight: 600; font-family: 'Roboto', sans-serif; }
+        [data-baseweb="tag"] { background-color: var(--color-primary-light) !important; border: 1px solid var(--color-primary) !important; color: var(--color-primary-dark) !important; font-weight: 500; padding: 4px 12px; border-radius: 6px; font-family: 'Roboto', sans-serif; }
+        [data-baseweb="tag"] svg { fill: var(--color-primary-hover) !important; }
+        [data-baseweb="tag"]:hover { background-color: rgba(20, 184, 166, 0.2) !important; border-color: var(--color-primary-hover) !important; }
         
         /* CHAT MESSAGES */
         .chat-message { padding: 12px 16px; border-radius: 12px; margin: 8px 0; font-size: 0.95rem; line-height: 1.5; }
-        .user-message { background-color: #14b8a6; color: white; margin-left: 20%; border-bottom-right-radius: 4px; }
-        .agent-message { background-color: #ffffff; border: 1px solid #e7e5e4; margin-right: 20%; border-bottom-left-radius: 4px; }
-        .file-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background-color: #f0fdfa; border: 1px solid #14b8a6; border-radius: 4px; font-size: 0.8rem; color: #0f766e; margin-right: 6px; margin-bottom: 6px; }
+        .user-message { background-color: var(--color-primary); color: white; margin-left: 20%; border-bottom-right-radius: 4px; }
+        .agent-message { background-color: var(--color-bg-secondary); border: 1px solid var(--color-border); margin-right: 20%; border-bottom-left-radius: 4px; color: var(--color-text); }
+        .file-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background-color: var(--color-primary-light); border: 1px solid var(--color-primary); border-radius: 4px; font-size: 0.8rem; color: var(--color-primary-dark); margin-right: 6px; margin-bottom: 6px; }
+        
+        /* MOBILE RESPONSIVENESS */
+        @media (max-width: 768px) {
+            /* Reduce font sizes and spacing for mobile */
+            .gradient-text { 
+                font-size: 1.5rem !important; 
+                margin-bottom: 0.25rem !important; 
+            }
+            
+            .section-header { 
+                font-size: 0.65rem !important; 
+                margin: 12px 0 6px 0 !important; 
+            }
+            
+            .chat-message { 
+                font-size: 0.85rem !important; 
+                padding: 10px 12px !important; 
+                margin: 6px 0 !important; 
+            }
+            
+            p, .stMarkdown p { 
+                font-size: 0.9rem !important; 
+                line-height: 1.4 !important; 
+            }
+            
+            /* Reduce padding on cards and sidebar */
+            .ui-card { 
+                padding: 16px !important; 
+                margin-bottom: 12px !important; 
+            }
+            
+            [data-testid="stSidebar"] { 
+                padding: 1rem 0.75rem !important; 
+            }
+            
+            /* Make image grid responsive - stack to 2 columns */
+            /* Target columns container and make each column 50% width for mobile */
+            [data-testid="column"] {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+                min-width: 50% !important;
+            }
+            
+            /* Ensure images within columns are responsive */
+            [data-testid="column"] img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            
+            /* Improve tap targets in sidebar */
+            [data-testid="stSidebar"] [class*="nav-link"] {
+                padding: 12px 12px !important;
+                margin: 4px 0 !important;
+                min-height: 44px !important;
+            }
+            
+            /* Increase tap targets for tabs */
+            [data-testid="stTabs"] button {
+                padding: 10px 12px !important;
+                min-height: 44px !important;
+            }
+            
+            /* Adjust chat message margins for mobile */
+            .user-message { 
+                margin-left: 10% !important; 
+            }
+            
+            .agent-message { 
+                margin-right: 10% !important; 
+            }
+        }
     </style>
     """, unsafe_allow_html=True)
 
 inject_custom_css()
+
+# --- THEME SCRIPT INJECTION ---
+theme = st.session_state.theme
+st.markdown(f"""
+<script>
+document.body.dataset.theme = '{theme}';
+</script>
+""", unsafe_allow_html=True)
 
 # --- FILE PROCESSING UTILITIES ---
 def clean_markdown(text: str) -> str:
@@ -175,7 +319,7 @@ class MADEngine:
             {context_str}
             {feedback_str}
             
-            Provide a comprehensive, well-structured response in markdown format. Be specific, actionable, and data-driven."""
+            IMPORTANT: You must follow the structure requested in the task text above. Use markdown headings (##, ###) for all required sections and include any requested markdown tables where specified. Be specific, actionable, and data-driven. Ensure all requested sections are clearly labeled and present in your response."""
             
             model = genai.GenerativeModel('gemini-2.0-flash-exp')
             response = model.generate_content(full_prompt)
@@ -190,6 +334,9 @@ class MADEngine:
             Original Task: {original_prompt}
             Creator's Output: {creator_output}
             Evaluate for completeness, accuracy, and actionability.
+            
+            CRITICAL: Check if all requested sections and any requested tables mentioned in the Original Task are present and clearly labeled in the Creator's Output. If required sections or structure are missing or unclear, mark approved: false and lower the score significantly (below 70).
+            
             Respond in JSON: {{ "approved": true/false, "score": 0-100, "feedback": "Specific feedback", "strengths": [], "weaknesses": [] }}"""
             
             model = genai.GenerativeModel('gemini-2.0-flash-exp')
@@ -263,19 +410,59 @@ def display_mad_result(data: Optional[Dict], filename: str = "report.md"):
 
 # --- SIDEBAR NAVIGATION ---
 with st.sidebar:
-    st.markdown("""<div style="padding:10px 0 20px 0; display:flex; align-items:center; gap:10px;"><div style="font-size:24px;">⚡</div><div><div style="font-weight:700; font-size:16px; color:#1a1f2e;">MarketingOS</div><div style="font-size:11px; color:#78716c;">Enterprise Edition</div></div></div>""", unsafe_allow_html=True)
-    if st.button("➕ New Analysis", type="primary", use_container_width=True):
-        st.session_state.current_analysis = None
-        st.session_state.chat_mode = False
-        st.session_state.uploaded_files = []
-        st.session_state.uploaded_images = []
-        st.session_state.url_context = ""
-        st.rerun()
+    # Check system status for status dot
+    status = check_systems()
+    status_color = "#10b981" if (status["gemini"] and status["mad_engine"]) else "#ef4444"
+    st.markdown(f"""<div style="padding:10px 0 20px 0; display:flex; align-items:center; gap:10px;"><div style="font-size:24px;">⚡</div><div style="flex:1;"><div style="display:flex; align-items:center; gap:8px;"><div style="font-weight:700; font-size:16px; color:#1a1f2e;">MarketingOS</div><div style="width:8px; height:8px; background-color:{status_color}; border-radius:50%;"></div></div><div style="font-size:11px; color:#78716c;">Enterprise Edition</div></div></div>""", unsafe_allow_html=True)
+    
+    # --- PLAYBOOKS SECTION ---
+    st.markdown('<div class="section-header">PLAYBOOKS</div>', unsafe_allow_html=True)
+    playbook_selection = st.selectbox("Playbook", ["None", "Product Launch", "SaaS Free Trial", "Webinar Promotion", "Seasonal Sale"], label_visibility="collapsed", key="playbook_select")
+    st.session_state.playbook = playbook_selection
+    
+    # Apply playbook preset values BEFORE creating widgets (only if fields are empty)
+    # This avoids StreamlitAPIException by setting values before widget instantiation
+    if st.session_state.playbook != "None":
+        if st.session_state.playbook == "Product Launch":
+            if not st.session_state.project_name:
+                st.session_state.project_name = "New Product Launch"
+            if not st.session_state.project_goal:
+                st.session_state.project_goal = "Drive awareness and signups for a new product launch in the next 4–8 weeks."
+        elif st.session_state.playbook == "SaaS Free Trial":
+            if not st.session_state.project_name:
+                st.session_state.project_name = "SaaS Free Trial Campaign"
+            if not st.session_state.project_goal:
+                st.session_state.project_goal = "Increase free trial signups and activations for the SaaS product."
+        elif st.session_state.playbook == "Webinar Promotion":
+            if not st.session_state.project_name:
+                st.session_state.project_name = "Webinar Promotion"
+            if not st.session_state.project_goal:
+                st.session_state.project_goal = "Drive registrations and attendance for an upcoming webinar."
+        elif st.session_state.playbook == "Seasonal Sale":
+            if not st.session_state.project_name:
+                st.session_state.project_name = "Seasonal Sale Campaign"
+            if not st.session_state.project_goal:
+                st.session_state.project_goal = "Boost revenue with a time-limited seasonal discount campaign."
+    
+    st.markdown('<div class="section-header">BRAND & PROJECT</div>', unsafe_allow_html=True)
+    st.text_input("Brand Name", key="brand_name")
+    st.text_input("Brand Voice / Tone", key="brand_voice")
+    st.text_input("Ideal Customer / Audience", key="brand_audience")
+    st.text_input("Key Offer / Product", key="brand_offer")
+    st.text_input("Project / Campaign Name", key="project_name")
+    st.text_input("Main Goal", key="project_goal")
     
     st.markdown('<div class="section-header">AI AGENTS</div>', unsafe_allow_html=True)
-    selected = option_menu(None, ["Audit", "PPC", "SEO", "Social", "Research", "Copy", "Strategy"], icons=["clipboard-data", "currency-dollar", "search", "instagram", "globe", "pencil-square", "diagram-3"], menu_icon="robot", default_index=0, styles={"container": {"padding": "0!important", "background-color": "transparent"}, "icon": {"color": "#14b8a6", "font-size": "16px"}, "nav-link": {"font-size": "14px", "text-align": "left", "margin": "2px 0", "padding": "8px 12px", "color": "#57534e", "font-weight": "400"}, "nav-link-selected": {"background-color": "#f0fdfa", "color": "#0f766e", "font-weight": "600"}})
+    # Determine default index based on target_agent (for Strategy pipeline navigation)
+    agent_list = ["Audit", "PPC", "SEO", "Social", "Research", "Copy", "Strategy"]
+    default_idx = 0
+    if st.session_state.target_agent and st.session_state.target_agent in agent_list:
+        default_idx = agent_list.index(st.session_state.target_agent)
+        st.session_state.target_agent = None  # Clear after use
+    selected = option_menu(None, agent_list, icons=["clipboard-data", "currency-dollar", "search", "instagram", "globe", "pencil-square", "diagram-3"], menu_icon="robot", default_index=default_idx, styles={"container": {"padding": "0!important", "background-color": "transparent"}, "icon": {"color": "#14b8a6", "font-size": "16px"}, "nav-link": {"font-size": "14px", "text-align": "left", "margin": "2px 0", "padding": "8px 12px", "color": "#57534e", "font-weight": "400"}, "nav-link-selected": {"background-color": "#f0fdfa", "color": "#0f766e", "font-weight": "600"}})
     
     st.markdown('<div class="section-header">CONTEXT</div>', unsafe_allow_html=True)
+    st.caption("Shared context (docs, images, URLs) used by all agents.")
     tab1, tab2, tab3 = st.tabs(["📄 Docs", "🖼️ Images", "🌐 URL"])
     
     with tab1:
@@ -299,38 +486,50 @@ with st.sidebar:
             st.session_state.uploaded_images = []
             st.session_state.url_context = ""
             st.rerun()
-
-    st.markdown('<div class="section-header">SYSTEM</div>', unsafe_allow_html=True)
-    with st.expander("⚙️ Configuration", expanded=False):
-        # --- SECURE GEMINI HANDLING ---
-        has_env_gemini = False
-        try:
-            if "GEMINI_API_KEY" in st.secrets: has_env_gemini = True
-        except: pass
-
-        if has_env_gemini:
-            st.success("✅ Gemini Key Loaded (Secure)")
-        else:
-            k1 = st.text_input("Gemini API Key", type="password", value=st.session_state.gemini_key)
-            if k1: st.session_state.gemini_key = k1
-
-        # --- SECURE PERPLEXITY HANDLING ---
-        has_env_perp = False
-        try:
-            if "PERPLEXITY_API_KEY" in st.secrets: has_env_perp = True
-        except: pass
-
-        if has_env_perp:
-            st.success("✅ Perplexity Key Loaded (Secure)")
-        else:
-            k2 = st.text_input("Perplexity API Key", type="password", value=st.session_state.perplexity_key)
-            if k2: st.session_state.perplexity_key = k2
     
-    st.markdown("<br>", unsafe_allow_html=True)
-    status = check_systems()
-    c1, c2 = st.columns(2)
-    with c1: st.markdown(f'<div class="status-badge"><span class="dot-{"online" if status["mad_engine"] else "offline"}"></span>Engine</div>', unsafe_allow_html=True)
-    with c2: st.markdown(f'<div class="status-badge"><span class="dot-{"online" if status["gemini"] else "offline"}"></span>Gemini</div>', unsafe_allow_html=True)
+    # --- THEME TOGGLE ---
+    st.markdown('<div class="section-header">THEME</div>', unsafe_allow_html=True)
+    theme_option = st.radio("Theme", ["Light", "Dark"], index=0 if st.session_state.theme == "light" else 1, label_visibility="collapsed", horizontal=True)
+    if theme_option == "Light" and st.session_state.theme != "light":
+        st.session_state.theme = "light"
+        st.rerun()
+    elif theme_option == "Dark" and st.session_state.theme != "dark":
+        st.session_state.theme = "dark"
+        st.rerun()
+
+    # --- SYSTEM SECTION (Hidden for normal users) ---
+    # Uncomment below to re-enable admin configuration UI:
+    # st.markdown('<div class="section-header">SYSTEM</div>', unsafe_allow_html=True)
+    # with st.expander("⚙️ Configuration", expanded=False):
+    #     # --- SECURE GEMINI HANDLING ---
+    #     has_env_gemini = False
+    #     try:
+    #         if "GEMINI_API_KEY" in st.secrets: has_env_gemini = True
+    #     except: pass
+    #
+    #     if has_env_gemini:
+    #         st.success("✅ Gemini Key Loaded (Secure)")
+    #     else:
+    #         k1 = st.text_input("Gemini API Key", type="password", value=st.session_state.gemini_key)
+    #         if k1: st.session_state.gemini_key = k1
+    #
+    #     # --- SECURE PERPLEXITY HANDLING ---
+    #     has_env_perp = False
+    #     try:
+    #         if "PERPLEXITY_API_KEY" in st.secrets: has_env_perp = True
+    #     except: pass
+    #
+    #     if has_env_perp:
+    #         st.success("✅ Perplexity Key Loaded (Secure)")
+    #     else:
+    #         k2 = st.text_input("Perplexity API Key", type="password", value=st.session_state.perplexity_key)
+    #         if k2: st.session_state.perplexity_key = k2
+    #
+    # st.markdown("<br>", unsafe_allow_html=True)
+    # status_badges = check_systems()
+    # c1, c2 = st.columns(2)
+    # with c1: st.markdown(f'<div class="status-badge"><span class="dot-{"online" if status_badges["mad_engine"] else "offline"}"></span>Engine</div>', unsafe_allow_html=True)
+    # with c2: st.markdown(f'<div class="status-badge"><span class="dot-{"online" if status_badges["gemini"] else "offline"}"></span>Gemini</div>', unsafe_allow_html=True)
 
 # --- MAIN CONTENT ---
 if st.session_state.chat_mode:
@@ -354,7 +553,26 @@ else:
     st.markdown(f'<h1 class="gradient-text">{selected} Agent</h1>', unsafe_allow_html=True)
     
     # Process Context
-    file_context = st.session_state.url_context
+    file_context = ""
+    
+    # Prepend Brand & Project Context if any fields are non-empty
+    brand_fields = {
+        "Brand Name": st.session_state.brand_name,
+        "Brand Voice": st.session_state.brand_voice,
+        "Ideal Customer": st.session_state.brand_audience,
+        "Key Offer": st.session_state.brand_offer,
+        "Project Name": st.session_state.project_name,
+        "Main Goal": st.session_state.project_goal
+    }
+    
+    if any(brand_fields.values()):
+        brand_context = "BRAND & PROJECT CONTEXT\n"
+        for key, value in brand_fields.items():
+            if value:
+                brand_context += f"{key}: {value}\n"
+        file_context = brand_context + "\n"
+    
+    file_context += st.session_state.url_context
     if st.session_state.uploaded_files:
         st.markdown("###### 📎 Attached Context:")
         badges = "".join([f'<span class="file-badge">📄 {f.name}</span>' for f in st.session_state.uploaded_files])
@@ -376,45 +594,115 @@ else:
                file_context += f"\nIMAGE ANALYSIS for {img.name}:\n{analysis}"
     
     if selected == "Audit":
-        st.markdown('<div class="ui-card"><h3>🏆 GA4 & GTM Auditor</h3></div>', unsafe_allow_html=True)
+        st.markdown('<div class="ui-card"><h3>🏆 GA4 & GTM Auditor</h3><p style="color: #78716c; font-size: 0.9rem; margin-top: -10px;">Comprehensive analysis of Google Analytics 4 and Google Tag Manager configurations, data quality, and tracking accuracy.</p></div>', unsafe_allow_html=True)
+        st.caption("Provide your GA4, GTM, and key event tracking details. This agent returns a clear audit of tracking accuracy, gaps, and optimization opportunities.")
         inp = st.text_area("Input Data", height=150)
         if st.button("🔍 Run Audit", type="primary"):
             if not inp and not file_context: st.warning("Provide data.")
             else:
                 with st.spinner("Analyzing..."):
                     eng = MADEngine(st.session_state.gemini_key)
-                    display_mad_result(eng.solve_task(f"Audit GA4/GTM data:\n{inp}", context=file_context), "audit.md")
+                    task = f"""Audit GA4/GTM data and provide a comprehensive analysis.
+
+Input Data:
+{inp}
+
+Required Structure:
+- ## Overview
+- ## Tracking Issues
+- ## Data Quality Risks
+- ## Recommended Fixes
+- ## Quick Wins & Next Steps
+
+Use markdown headings for each section and provide specific, actionable findings."""
+                    display_mad_result(eng.solve_task(task, context=file_context), "audit.md")
 
     elif selected == "PPC":
-        st.markdown('<div class="ui-card"><h3>💰 PPC Optimizer</h3></div>', unsafe_allow_html=True)
-        inp = st.text_area("Campaign Data", height=150)
+        st.markdown('<div class="ui-card"><h3>💰 PPC Optimizer</h3><p style="color: #78716c; font-size: 0.9rem; margin-top: -10px;">Analyze and optimize pay-per-click campaigns across Google Ads, Microsoft Ads, and other platforms for better ROI.</p></div>', unsafe_allow_html=True)
+        st.caption("Provide your campaign structure, targeting, budgets, and performance data. This agent returns a prioritized plan to improve ROAS and cut wasted spend.")
+        # Use prefill value if available, then clear it
+        prefill_value = st.session_state.ppc_prefill if st.session_state.ppc_prefill else ""
+        if st.session_state.ppc_prefill:
+            st.session_state.ppc_prefill = ""  # Clear after displaying once
+        inp = st.text_area("Campaign Data", height=150, value=prefill_value)
         if st.button("📊 Analyze", type="primary"):
             if not inp and not file_context: st.warning("Provide data.")
             else:
                 with st.spinner("Analyzing..."):
                     eng = MADEngine(st.session_state.gemini_key)
-                    display_mad_result(eng.solve_task(f"Analyze PPC data:\n{inp}", context=file_context), "ppc.md")
+                    task = f"""Analyze PPC campaign data and provide optimization recommendations.
+
+Campaign Data:
+{inp}
+
+Required Structure:
+- ## Account Overview
+- ## Waste & Inefficiencies
+- ## Winning Segments
+- ## Recommended Changes
+- ## KPIs to Monitor
+
+Include a markdown table for key campaigns or ad groups with columns: Campaign, Issue/Opportunity, Action, Expected Impact."""
+                    display_mad_result(eng.solve_task(task, context=file_context), "ppc.md")
 
     elif selected == "SEO":
-        st.markdown('<div class="ui-card"><h3>🔍 SEO Planner</h3></div>', unsafe_allow_html=True)
-        kw = st.text_area("Keywords", height=100)
+        st.markdown('<div class="ui-card"><h3>🔍 SEO Planner</h3><p style="color: #78716c; font-size: 0.9rem; margin-top: -10px;">Develop comprehensive SEO strategies with keyword research, content planning, and technical optimization recommendations.</p></div>', unsafe_allow_html=True)
+        st.caption("Provide your target keywords, pages, and SEO objectives. This agent returns a structured strategy with topic clusters, on‑page improvements, and content priorities.")
+        # Use prefill value if available, then clear it
+        prefill_value = st.session_state.seo_prefill if st.session_state.seo_prefill else ""
+        if st.session_state.seo_prefill:
+            st.session_state.seo_prefill = ""  # Clear after displaying once
+        kw = st.text_area("Keywords", height=100, value=prefill_value)
         if st.button("🎯 Plan", type="primary"):
             with st.spinner("Planning..."):
                 eng = MADEngine(st.session_state.gemini_key)
-                display_mad_result(eng.solve_task(f"SEO Strategy for:\n{kw}", context=file_context), "seo.md")
+                task = f"""Create an SEO strategy plan based on the following keywords and objectives.
+
+Keywords/Input:
+{kw}
+
+Required Structure:
+- ## SEO Overview
+- ## Keyword/Topic Clusters
+- ## On‑Page Improvements
+- ## Content Opportunities
+- ## Technical Notes
+- ## Next 30‑Day Plan
+
+Include at least one markdown table listing: Keyword/Cluster, Intent, Priority, Suggested Page/Content."""
+                display_mad_result(eng.solve_task(task, context=file_context), "seo.md")
 
     elif selected == "Social":
-        st.markdown('<div class="ui-card"><h3>📱 Social Media Manager</h3></div>', unsafe_allow_html=True)
+        st.markdown('<div class="ui-card"><h3>📱 Social Media Manager</h3><p style="color: #78716c; font-size: 0.9rem; margin-top: -10px;">Generate content calendars, post ideas, and engagement strategies tailored to your niche and target platforms.</p></div>', unsafe_allow_html=True)
+        st.caption("Describe your brand, audience, and chosen social platforms. This agent returns a channel‑specific content calendar with post ideas and messaging angles.")
+        # Use prefill value if available, then clear it
+        prefill_value = st.session_state.social_prefill if st.session_state.social_prefill else ""
+        if st.session_state.social_prefill:
+            st.session_state.social_prefill = ""  # Clear after displaying once
         c1, c2 = st.columns(2)
-        with c1: niche = st.text_input("Niche")
+        with c1: niche = st.text_input("Niche", value=prefill_value)
         with c2: plat = st.multiselect("Platforms", ["LinkedIn", "Twitter", "Instagram"])
         if st.button("📅 Generate", type="primary"):
             with st.spinner("Generating..."):
                 eng = MADEngine(st.session_state.gemini_key)
-                display_mad_result(eng.solve_task(f"Social Calendar for {niche} on {plat}", context=file_context), "calendar.md")
+                task = f"""Create a social media content calendar and strategy.
+
+Brand/Niche: {niche}
+Platforms: {', '.join(plat) if plat else 'Not specified'}
+
+Required Structure:
+- ## Audience & Positioning
+- ## Content Themes
+- ## Posting Cadence
+- ## Sample Posts by Platform
+- ## CTAs & KPIs
+
+Include a simple markdown table or bullet calendar with columns: Day, Platform, Theme, Hook."""
+                display_mad_result(eng.solve_task(task, context=file_context), "calendar.md")
 
     elif selected == "Research":
-        st.markdown('<div class="ui-card"><h3>🌍 Deep Researcher</h3></div>', unsafe_allow_html=True)
+        st.markdown('<div class="ui-card"><h3>🌍 Deep Researcher</h3><p style="color: #78716c; font-size: 0.9rem; margin-top: -10px;">Conduct in-depth research on any topic using web search, Perplexity AI, or DuckDuckGo to gather comprehensive insights.</p></div>', unsafe_allow_html=True)
+        st.caption("Provide the market, audience, or topic you want to understand. This agent returns synthesized insights from web data, including trends, competitors, and opportunities.")
         q = st.text_input("Topic")
         use_perp = st.checkbox("Use Perplexity", value=bool(st.session_state.perplexity_key), disabled=not st.session_state.perplexity_key)
         if st.button("🔎 Research", type="primary"):
@@ -438,27 +726,128 @@ else:
                         results = DDGS().text(q, max_results=5)
                         web_data = str(results)
                     
-                    display_mad_result(eng.solve_task(f"Research: {q}\nWeb Data: {web_data}", context=file_context), "research.md")
+                    task = f"""Conduct deep research on the following topic and synthesize insights.
+
+Research Topic: {q}
+
+Web Data:
+{web_data}
+
+Required Structure:
+- ## Executive Summary
+- ## Market Overview
+- ## Audience Insights
+- ## Competitor Highlights
+- ## Risks & Opportunities
+- ## Recommended Actions
+
+Provide comprehensive, well-organized insights based on the research data."""
+                    display_mad_result(eng.solve_task(task, context=file_context), "research.md")
                 except Exception as e: st.error(str(e))
 
     elif selected == "Copy":
-        st.markdown('<div class="ui-card"><h3>✍️ AI Copywriter</h3></div>', unsafe_allow_html=True)
-        txt = st.text_area("Text", height=150)
+        st.markdown('<div class="ui-card"><h3>✍️ AI Copywriter</h3><p style="color: #78716c; font-size: 0.9rem; margin-top: -10px;">Rewrite and enhance your marketing copy in different styles to improve clarity, persuasiveness, or professionalism.</p></div>', unsafe_allow_html=True)
+        st.caption("Provide the message, offer, or content you want refined, plus your preferred tone. This agent returns on‑brand copy variations tailored to your objectives.")
+        # Use prefill value if available, then clear it
+        prefill_value = st.session_state.copy_prefill if st.session_state.copy_prefill else ""
+        if st.session_state.copy_prefill:
+            st.session_state.copy_prefill = ""  # Clear after displaying once
+        txt = st.text_area("Text", height=150, value=prefill_value)
         style = st.selectbox("Style", ["Simplify", "Persuasive", "Professional"])
         if st.button("✨ Rewrite", type="primary"):
             with st.spinner("Writing..."):
                 eng = MADEngine(st.session_state.gemini_key)
                 # Use clean_markdown to format output
-                res = eng.call_creator(f"Rewrite in {style} style:\n{txt if txt else file_context}")
+                task = f"""Rewrite the following content in {style} style.
+
+Original Content:
+{txt if txt else file_context}
+
+Required Structure:
+- ## Brief Understanding
+- ## Core Message
+- ## Variations (provide multiple versions of the copy)
+- ## Notes on Tone & Angle
+
+Provide multiple copy variations and explain the tone and messaging approach."""
+                res = eng.call_creator(task)
                 st.markdown(clean_markdown(res))
 
     elif selected == "Strategy":
-        st.markdown('<div class="ui-card"><h3>🧩 Strategy Architect</h3></div>', unsafe_allow_html=True)
-        goal = st.text_input("Goal")
+        st.markdown('<div class="ui-card"><h3>🧩 Strategy Architect</h3><p style="color: #78716c; font-size: 0.9rem; margin-top: -10px;">Build comprehensive marketing strategies with actionable plans, tactics, and roadmaps to achieve your business objectives.</p></div>', unsafe_allow_html=True)
+        st.caption("Provide your primary business or campaign goal and any constraints. This agent returns a cross‑channel marketing strategy with key plays and success metrics.")
+        # Prefill goal with project_goal if goal is empty and project_goal exists
+        if 'strategy_goal' not in st.session_state:
+            st.session_state.strategy_goal = ""
+        # If strategy_goal is empty and project_goal exists, use project_goal as default
+        if not st.session_state.strategy_goal and st.session_state.project_goal:
+            st.session_state.strategy_goal = st.session_state.project_goal
+        goal = st.text_input("Goal", key="strategy_goal")
         if st.button("🚀 Build", type="primary"):
             with st.spinner("Building..."):
                 eng = MADEngine(st.session_state.gemini_key)
-                display_mad_result(eng.solve_task(f"Strategy for: {goal}", context=file_context), "strategy.md")
+                task = f"""Build a comprehensive marketing strategy.
+
+Goal: {goal}
+
+Required Structure:
+- ## Context & Goal
+- ## Channel Strategy (SEO, PPC, Social, Email, Other)
+- ## Key Plays
+- ## Timeline / Phasing
+- ## KPIs & Targets
+- ## Risks & Assumptions
+
+Provide a detailed, actionable cross-channel marketing strategy with clear phases and success metrics."""
+                display_mad_result(eng.solve_task(task, context=file_context), "strategy.md")
+        
+        # --- STRATEGY PIPELINE: Send to execution agents ---
+        if st.session_state.current_analysis is not None and selected == "Strategy":
+            st.markdown("---")
+            st.markdown("### Use this strategy in other agents")
+            st.caption("Send your strategy to execution agents to create detailed plans.")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("Send to SEO agent", use_container_width=True):
+                    st.session_state.seo_prefill = st.session_state.current_analysis
+                    st.session_state.target_agent = "SEO"
+                    st.rerun()
+                if st.button("Send to PPC agent", use_container_width=True):
+                    st.session_state.ppc_prefill = st.session_state.current_analysis
+                    st.session_state.target_agent = "PPC"
+                    st.rerun()
+            with col2:
+                if st.button("Send to Social agent", use_container_width=True):
+                    st.session_state.social_prefill = st.session_state.current_analysis
+                    st.session_state.target_agent = "Social"
+                    st.rerun()
+                if st.button("Send to Copy agent", use_container_width=True):
+                    st.session_state.copy_prefill = st.session_state.current_analysis
+                    st.session_state.target_agent = "Copy"
+                    st.rerun()
+
+    # --- EMBEDDED CHAT PANEL ---
+    if st.session_state.current_analysis is not None and not st.session_state.chat_mode:
+        st.markdown("### 💬 Quick Questions About This Analysis")
+        
+        # Display up to the last 3 messages if chat_messages is non-empty
+        if st.session_state.chat_messages:
+            recent_messages = st.session_state.chat_messages[-3:]
+            for msg in recent_messages:
+                st.markdown(f'<div class="chat-message {"user-message" if msg["role"] == "user" else "agent-message"}">{msg["content"]}</div>', unsafe_allow_html=True)
+        
+        # Chat input for embedded panel
+        user_input = st.chat_input("Ask something about this analysis…")
+        if user_input:
+            st.session_state.chat_messages.append({"role": "user", "content": user_input})
+            try:
+                engine = MADEngine(st.session_state.gemini_key)
+                resp = engine.chat_response(user_input, st.session_state.chat_messages, st.session_state.current_analysis)
+                st.session_state.chat_messages.append({"role": "assistant", "content": resp})
+            except Exception as e:
+                st.session_state.chat_messages.append({"role": "assistant", "content": f"Error: {str(e)}"})
+            st.rerun()
 
 # --- FOOTER ---
 st.markdown("---")
